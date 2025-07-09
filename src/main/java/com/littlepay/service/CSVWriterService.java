@@ -35,7 +35,7 @@ public class CSVWriterService extends FileWriterService {
             return;
         }
 
-        // Implement the logic to write to a CSV file
+        // Write processed records to a CSV file
         StringWriter sw = new StringWriter();
 
         CSVFormat csvFormat = CSVFormat.DEFAULT.builder()

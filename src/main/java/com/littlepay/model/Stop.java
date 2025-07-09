@@ -17,4 +17,8 @@ public class Stop {
     public Stop(String stopId) {
         this.stopId = stopId;
     }
+
+    public int getId() {
+        return Integer.parseInt(stopId.split("Stop")[1]);
+    }
 }

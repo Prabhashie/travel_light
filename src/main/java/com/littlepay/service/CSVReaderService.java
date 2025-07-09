@@ -47,32 +47,38 @@ public class CSVReaderService extends FileReaderService {
             List<InputRecord> inputRecords = new ArrayList<>();
 
             for (CSVRecord record : records) {
-                int id = Integer.parseInt(record.get("ID").trim());
-
-                // parse the date time string to LocalDateTime
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy H:mm");
-                LocalDateTime dateTimeUTC = LocalDateTime.parse(record.get("DateTimeUTC").trim(), formatter);
-
-                TapType tapType = TapType.valueOf(record.get("TapType").trim());
-                Stop stop = new Stop(record.get("StopId").trim());
-                Company company =  new Company(record.get("CompanyId").trim());
-                Bus bus = new Bus(record.get("BusID").trim());
-                Long pan = Long.parseLong(record.get("PAN").trim());
-
-                InputRecord inputRecord = InputRecord.builder()
-                        .id(id)
-                        .dateTimeUTC(dateTimeUTC)
-                        .tapType(tapType)
-                        .stopId(stop)
-                        .companyId(company)
-                        .busId(bus)
-                        .pan(pan)
-                        .build();
-
+                InputRecord inputRecord = convertToInputRecord(record);
                 inputRecords.add(inputRecord);
             }
 
             return inputRecords;
         }
+    }
+
+    private InputRecord convertToInputRecord(CSVRecord record) {
+        LOG.info("Converting InputRecord to InputRecord");
+
+        int id = Integer.parseInt(record.get("ID").trim());
+
+        // parse the date time string to LocalDateTime
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy H:mm");
+        LocalDateTime dateTimeUTC = LocalDateTime.parse(record.get("DateTimeUTC").trim(), formatter);
+
+        TapType tapType = TapType.valueOf(record.get("TapType").trim());
+        Stop stop = new Stop(record.get("StopId").trim());
+        Company company =  new Company(record.get("CompanyId").trim());
+        Bus bus = new Bus(record.get("BusID").trim());
+        Long pan = Long.parseLong(record.get("PAN").trim());
+
+        return InputRecord.builder()
+                .id(id)
+                .dateTimeUTC(dateTimeUTC)
+                .tapType(tapType)
+                .stopId(stop)
+                .companyId(company)
+                .busId(bus)
+                .pan(pan)
+                .build();
+
     }
 }

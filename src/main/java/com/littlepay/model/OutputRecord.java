@@ -18,7 +18,7 @@ public class OutputRecord {
 
     private LocalDateTime finishUTC;
 
-    private long durationSecs;
+    private Long durationSecs; // duration can be null for incomlete trips
 
     private Stop fromStopId;
 
