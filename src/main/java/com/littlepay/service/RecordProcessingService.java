@@ -4,7 +4,8 @@ import com.littlepay.model.InputRecord;
 import com.littlepay.model.OutputRecord;
 import com.littlepay.model.TapType;
 import com.littlepay.model.TripStatus;
-import com.littlepay.repository.RouteChargesRepository;
+import com.littlepay.repository.RouteDataRepository;
+import com.littlepay.repository.StopDataRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,10 @@ public class RecordProcessingService {
     public static final Logger LOG = LoggerFactory.getLogger(RecordProcessingService.class);
 
     @Autowired
-    private RouteChargesRepository routeChargesRepository;
+    private RouteDataRepository routeDataRepository;
+
+    @Autowired
+    private StopDataRepository stopDataRepository;
 
     /**
      * Processes a list of input records and generates output records.
@@ -169,7 +173,7 @@ public class RecordProcessingService {
                 .durationSecs(current.getDateTimeUTC().toEpochSecond(ZoneOffset.UTC) - previous.getDateTimeUTC().toEpochSecond(ZoneOffset.UTC))
                 .fromStopId(previous.getStopId())
                 .toStopId(current.getStopId())
-                .chargeAmount(RouteChargesRepository.get(previous.getStopId().getId(), current.getStopId().getId()))
+                .chargeAmount(routeDataRepository.getChargeBetween(previous.getStopId(), current.getStopId()))
                 .companyId(previous.getCompanyId())
                 .busId(previous.getBusId())
                 .pan(previous.getPan())
@@ -184,7 +188,7 @@ public class RecordProcessingService {
                 .durationSecs(null)
                 .fromStopId(previous.getStopId())
                 .toStopId(null)
-                .chargeAmount(0.0D) // @TODO: Handle incomplete trip charges
+                .chargeAmount(stopDataRepository.getMaxRouteLegCostFromStop(previous.getStopId()))
                 .companyId(previous.getCompanyId())
                 .busId(previous.getBusId())
                 .pan(previous.getPan())

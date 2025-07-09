@@ -28,7 +28,7 @@ public class CSVWriterService extends FileWriterService {
     @Override
     public void process(String fileName, List<OutputRecord> outputRecords) throws IOException {
 
-        LOG.info("Writing to CSV file");
+        LOG.info("Writing to CSV file: {}", fileName);
 
         if (outputRecords == null || outputRecords.isEmpty()) {
             LOG.warn("No records to write to CSV file: {}", fileName);
@@ -46,10 +46,10 @@ public class CSVWriterService extends FileWriterService {
             for (OutputRecord record : outputRecords) {
                 printer.printRecord(
                         record.getStartUTC(),
-                        record.getFinishUTC(),
-                        record.getDurationSecs(),
+                        record.getFinishUTC() != null ? record.getFinishUTC() : "N/A",
+                        record.getDurationSecs() != null ? record.getDurationSecs() : "N/A",
                         record.getFromStopId().getStopId(),
-                        record.getToStopId().getStopId(),
+                        record.getToStopId() != null? record.getToStopId().getStopId() : "N/A",
                         record.getChargeAmount(),
                         record.getCompanyId().getCompanyId(),
                         record.getBusId().getBusId(),

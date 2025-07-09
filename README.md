@@ -31,7 +31,9 @@ You can also run the tests individually by running the main method in each test 
 
 ---
 ## Assumptions
-
+- Since this is currently implemented as a CLI application, the input CSV file is expected to be in the `src/main/resources` directory
+  and the output CSV file will be generated in the same directory.
+- Also, there's no user authorization or authentication implemented, so the application is assumed to be run by an authorized user.
 ---
 ## Questions
 - Does the leg list include all possible combinations of legs along a route?

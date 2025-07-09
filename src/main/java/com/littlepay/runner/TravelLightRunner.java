@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ import java.util.List;
  * @author Sachi
  */
 @Component
-@Profile("!test") // Exclude this runner from the test profile
+// @Profile("!test") // Exclude this runner from the test profile
 public class TravelLightRunner implements CommandLineRunner {
 
     public static final Logger LOG = LoggerFactory.getLogger(TravelLightRunner.class);
@@ -47,7 +46,19 @@ public class TravelLightRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        LOG.info("Starting TravelLightRunner with input file: {} and output file: {}", inputFileName, outputFileName);
+        LOG.info("Running TravelLightRunner...");
+
+        if (inputFileName == null || inputFileName.isEmpty()) {
+
+            LOG.error("Input file path is not set or is empty. Please set the 'input.file.path' property.");
+            System.exit(1);
+        }
+        if (outputFileName == null || outputFileName.isEmpty()) {
+            LOG.error("Output file path is not set or is empty. Please set the 'output.file.path' property.");
+            System.exit(1);
+        }
+
+        LOG.info("Input file name: {} and output file name: {}", inputFileName, outputFileName);
 
         List<InputRecord> inputRecords = null;
 

@@ -55,6 +55,12 @@ public class CSVReaderService extends FileReaderService {
         }
     }
 
+    /**
+     * Converts a CSVRecord to an InputRecord.
+     *
+     * @param record the CSVRecord to convert
+     * @return the converted InputRecord
+     */
     private InputRecord convertToInputRecord(CSVRecord record) {
         LOG.info("Converting InputRecord to InputRecord");
 
