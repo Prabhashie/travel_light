@@ -3,15 +3,22 @@ package com.littlepay.runner;
 import com.littlepay.model.InputRecord;
 import com.littlepay.service.CSVReaderService;
 import com.littlepay.service.CSVWriterService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * CommandLineRunner implementation to read input CSV, process the records, and write output CSV.
+ * This class is executed at application startup.
+ *
+ * @author Sachi
+ */
 @Component
+@Profile("!test") // Exclude this runner from the test profile
 public class TravelLightRunner implements CommandLineRunner {
 
     private final CSVReaderService csvReaderService;
@@ -31,15 +38,18 @@ public class TravelLightRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // read the input CSV file
+        // Read the input CSV file
         try {
-            csvReaderService.process(inputFileName);
+            List<InputRecord> inputRecords = csvReaderService.process(inputFileName);
         } catch (IOException e) {
-            // log error and exit without throwing the plain exception for better user experience
+            // Log error and exit without throwing the plain exception for better user experience
             System.err.println("Error reading CSV file: " + e.getMessage());
             System.exit(1);
         }
 
-        List<InputRecord> inputRecords = csvReaderService.getInputRecords();
+        // Process the input records
+
+        // Write the output to a CSV file
+
     }
 }

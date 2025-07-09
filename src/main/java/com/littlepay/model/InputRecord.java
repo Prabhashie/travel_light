@@ -4,8 +4,12 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
+/**
+ * An entity class to store an inpuqt record
+ *
+ * @author Sachi
+ */
 @Data
 @Builder
 public class InputRecord {
