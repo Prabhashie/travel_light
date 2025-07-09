@@ -18,6 +18,16 @@ java -jar target/travel_light-1.0-SNAPSHOT.jar
 2. If running from an IDE, run the main method in the `com.travellight.TravelLightApplication` class.
 ---
 ## How to run the tests
+Include the input CSV file in the `src/test/resources` directory.
+The file should be named `input.csv`.
+
+1. If running from the command line, navigate to the root directory of the project and run:
+```bash
+mvn clean test
+```
+2. If running from an IDE, run the test classes in the `com.travellight` package.
+
+You can also run the tests individually by running the main method in each test class.
 
 ---
 ## Assumptions

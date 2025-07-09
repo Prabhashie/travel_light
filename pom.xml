@@ -41,6 +41,13 @@
             <version>1.10.0</version>
         </dependency>
 
+        <!-- Apache Commons IO for data storage -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

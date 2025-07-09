@@ -30,6 +30,11 @@ public class CSVWriterService extends FileWriterService {
 
         LOG.info("Writing to CSV file");
 
+        if (outputRecords == null || outputRecords.isEmpty()) {
+            LOG.warn("No records to write to CSV file: {}", fileName);
+            return;
+        }
+
         // Implement the logic to write to a CSV file
         StringWriter sw = new StringWriter();
 
