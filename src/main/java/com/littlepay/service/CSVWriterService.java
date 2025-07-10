@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -45,11 +46,12 @@ public class CSVWriterService extends FileWriterService {
             Writer writer = new FileWriter(fileName);
         ) {
             CSVPrinter printer = new CSVPrinter(writer, csvFormat);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy H:mm");
 
             for (OutputRecord record : outputRecords) {
                 printer.printRecord(
-                        record.getStartUTC(),
-                        record.getFinishUTC() != null ? record.getFinishUTC() : "N/A",
+                        record.getStartUTC() != null ? record.getStartUTC().format(formatter) : "N/A",
+                        record.getFinishUTC() != null ? record.getFinishUTC().format(formatter) : "N/A",
                         record.getDurationSecs() != null ? record.getDurationSecs() : "N/A",
                         record.getFromStopId().getStopId(),
                         record.getToStopId() != null? record.getToStopId().getStopId() : "N/A",

@@ -58,5 +58,11 @@ You can also run the tests individually by running the main method in each test 
 - Also, there's no user authorization or authentication implemented, so the application is assumed to be run by an authorized user.
 - All input data is assumed to be valid and well-formed.
 - A tap OFF with no matching tap ON is considered an incomplete trip.
+- I haven't written all possible test cases to meet coverage requirements in the interest of time. But the provided tests cover the main scenarios.
 ---
-
+# Improvements
+- The application is designed to be simple and easy to understand, focusing on the core business logic.
+- It can be extended to include more features, such as user authentication, data validation, and error handling.
+- The true capabilities of Spring Boot, such as dependency injection, AOP, and transaction management, are not fully utilized in this simple CLI application.
+- Scalability and performance in a real world application can be explored by developing into a Restful API or a microservice.
+- By hosting the application on a cloud platform like AWS, it can be made highly available and scalable.
