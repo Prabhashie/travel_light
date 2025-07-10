@@ -7,8 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringWriter;
+import java.io.Writer;
 import java.util.List;
 
 /**
@@ -35,14 +37,15 @@ public class CSVWriterService extends FileWriterService {
             return;
         }
 
-        // Write processed records to a CSV file
-        StringWriter sw = new StringWriter();
-
         CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
                 .setHeader(HEADERS)
                 .build();
 
-        try (final CSVPrinter printer = new CSVPrinter(sw, csvFormat)) {
+        try (
+            Writer writer = new FileWriter(fileName);
+        ) {
+            CSVPrinter printer = new CSVPrinter(writer, csvFormat);
+
             for (OutputRecord record : outputRecords) {
                 printer.printRecord(
                         record.getStartUTC(),

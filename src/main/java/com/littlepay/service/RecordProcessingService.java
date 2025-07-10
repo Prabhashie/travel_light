@@ -8,7 +8,6 @@ import com.littlepay.repository.RouteDataRepository;
 import com.littlepay.repository.StopDataRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
@@ -28,11 +27,14 @@ public class RecordProcessingService {
 
     public static final Logger LOG = LoggerFactory.getLogger(RecordProcessingService.class);
 
-    @Autowired
-    private RouteDataRepository routeDataRepository;
+    private final RouteDataRepository routeDataRepository;
 
-    @Autowired
-    private StopDataRepository stopDataRepository;
+    private final StopDataRepository stopDataRepository;
+
+    public RecordProcessingService(RouteDataRepository routeDataRepository, StopDataRepository stopDataRepository) {
+        this.routeDataRepository = routeDataRepository;
+        this.stopDataRepository = stopDataRepository;
+    }
 
     /**
      * Processes a list of input records and generates output records.
@@ -43,7 +45,7 @@ public class RecordProcessingService {
     public List<OutputRecord> processRecords(List<InputRecord> inputRecords) {
         LOG.info("Processing {} input records", inputRecords.size());
 
-        if (inputRecords == null || inputRecords.isEmpty()) {
+        if (inputRecords.isEmpty()) {
             LOG.warn("No input records to process");
             return null;
         }
@@ -63,7 +65,7 @@ public class RecordProcessingService {
     /**
      * Generates output records from grouped input records.
      *
-     * @param groupedRecords Map of PAN to list of input records
+     * @param groupedRecords Map of PAN to a list of input records
      * @return List of output records
      */
     private List<OutputRecord> generateOutputRecords(Map<Long, List<InputRecord>> groupedRecords) {
@@ -75,50 +77,100 @@ public class RecordProcessingService {
             Long pan = entry.getKey();
             List<InputRecord> records = entry.getValue();
 
-            int previousIndex = 0;
-            int currentIndex = 1;
+            processRecordGroups(pan, records, outputRecords);
+        }
+        return outputRecords.stream()
+                .sorted(Comparator.comparing(OutputRecord::getPan))
+                .collect(Collectors.toList()); // Sort output records by PAN
+    }
 
-            while (previousIndex < records.size() && currentIndex < records.size()) {
-                InputRecord previous = records.get(previousIndex);
+    /**
+     * Processes groups of input records for a specific PAN and generates output records.
+     *
+     * @param pan           PAN associated with the input records
+     * @param records       List of input records for the PAN
+     * @param outputRecords List to store the generated output records
+     */
+    private void processRecordGroups(Long pan, List<InputRecord> records, List<OutputRecord> outputRecords) {
+        int previousIndex = 0;
+
+        while (previousIndex < records.size()) {
+            int currentIndex = previousIndex + 1;
+            InputRecord previous = records.get(previousIndex);
+
+            if (currentIndex < records.size()) {
                 InputRecord current = records.get(currentIndex);
-                LOG.trace("Processing record for PAN: {}, DateTimeUTC: {}, TapType: {}, Stop: {}, Bus: {}",
-                        pan, current.getDateTimeUTC(), current.getTapType(), current.getStopId(), current.getBusId());
-
-                // Previous tap was ON, check the current tap
-                if (previous.getTapType().equals(TapType.ON)) {
-                    // Current tap is OFF
-                    if (current.getTapType().equals(TapType.OFF)) {
-                        // Current tap in on the same bus
-                        if (current.getBusId().equals(previous.getBusId())) {
-                            // Tapping at the same stop -> Cancelled trip
-                            if (current.getStopId().equals(previous.getStopId())) {
-                                outputRecords.add(buildOutputRecord(previous, current, TripStatus.CANCELLED));
-
-                                // Move to the next pair of records
-                                previousIndex += 2;
-                                currentIndex += 2;
-                            } else { // Tapping at different stops -> Complete trip
-                                // If the stop is different, we build an output record
-                                outputRecords.add(buildOutputRecord(previous, current, TripStatus.COMPLETE));
-
-                                // Move to the next pair of records
-                                previousIndex += 2;
-                                currentIndex += 2;
-                            }
-                        }
-                    } else { // Consecutive ON taps -> Incomplete trip
+                if (isTappedOn(previous)) {
+                    if (isTappedOff(current) && isSameBus(previous, current) && isSameDate(previous, current)) {
+                        TripStatus status = isSameStop(previous, current) ? TripStatus.CANCELLED : TripStatus.COMPLETE;
+                        outputRecords.add(buildOutputRecord(previous, current, status));
+                        previousIndex += 2;
+                        continue;
+                    } else {
                         outputRecords.add(buildOutputRecord(previous, null, TripStatus.INCOMPLETE));
-                        previousIndex++;
-                        currentIndex++;
                     }
                 } else {
-                    previousIndex++;
-                    currentIndex++;
+                    outputRecords.add(buildOutputRecord(previous, null, TripStatus.INCOMPLETE));
                 }
+            } else {
+                outputRecords.add(buildOutputRecord(previous, null, TripStatus.INCOMPLETE));
             }
-        }
 
-        return outputRecords;
+            previousIndex++;
+        }
+    }
+
+    /**
+     * Checks if the previous input record indicates a tap ON.
+     *
+     * @param previous Previous input record
+     * @return true if the previous record is a tap ON, false otherwise
+     */
+    private boolean isTappedOn(InputRecord previous) {
+        return previous.getTapType().equals(TapType.ON);
+    }
+
+    /**
+     * Checks if the current input record indicates a tap OFF.
+     *
+     * @param current Current input record
+     * @return true if the current record is a tap OFF, false otherwise
+     */
+    private boolean isTappedOff(InputRecord current) {
+        return current.getTapType().equals(TapType.OFF);
+    }
+
+    /**
+     * Checks if the current input record is for the same stop as the previous input record.
+     *
+     * @param previous Previous input record
+     * @param current Current input record
+     * @return true if both records are for the same stop, false otherwise
+     */
+    private boolean isSameStop(InputRecord previous, InputRecord current) {
+        return current.getStopId().equals(previous.getStopId());
+    }
+
+    /**
+     * Checks if the current input record is for the same bus as the previous input record.
+     *
+     * @param previous Previous input record
+     * @param current Current input record
+     * @return true if both records are for the same bus, false otherwise
+     */
+    private boolean isSameBus(InputRecord previous, InputRecord current) {
+        return current.getBusId().equals(previous.getBusId());
+    }
+
+    /**
+     * Checks if the current input record is on the same date as the previous input record.
+     *
+     * @param previous Previous input record
+     * @param current Current input record
+     * @return true if both records are on the same date, false otherwise
+     */
+    private boolean isSameDate(InputRecord previous, InputRecord current) {
+        return previous.getDateTimeUTC().toLocalDate().equals(current.getDateTimeUTC().toLocalDate());
     }
 
     /**
@@ -130,10 +182,12 @@ public class RecordProcessingService {
      * @return Output record containing the processed information
      */
     private OutputRecord buildOutputRecord(InputRecord previous, InputRecord current, TripStatus tripStatus) {
+        LOG.trace("Building output record");
+
         return switch (tripStatus) {
-            case CANCELLED -> cancelledTripOutputRecord(previous, current);
-            case COMPLETE -> completeTripOutputRecord(previous, current);
-            case INCOMPLETE -> incompleteTripOutputRecord(previous);
+            case CANCELLED -> getCancelledTripOutputRecord(previous, current);
+            case COMPLETE -> getCompleteTripOutputRecord(previous, current);
+            case INCOMPLETE -> getIncompleteTripOutputRecord(previous);
         };
     }
 
@@ -144,7 +198,9 @@ public class RecordProcessingService {
      * @param current Current input record
      * @return Output record for the cancelled trip
      */
-    private OutputRecord cancelledTripOutputRecord(InputRecord previous, InputRecord current) {
+    private OutputRecord getCancelledTripOutputRecord(InputRecord previous, InputRecord current) {
+        LOG.trace("Cancelled trip output record");
+
         return OutputRecord.builder()
                 .startUTC(previous.getDateTimeUTC())
                 .finishUTC(current.getDateTimeUTC())
@@ -166,7 +222,9 @@ public class RecordProcessingService {
      * @param current Current input record
      * @return Output record for the complete trip
      */
-    private OutputRecord completeTripOutputRecord(InputRecord previous, InputRecord current) {
+    private OutputRecord getCompleteTripOutputRecord(InputRecord previous, InputRecord current) {
+        LOG.trace("Completed trip output record");
+
         return OutputRecord.builder()
                 .startUTC(previous.getDateTimeUTC())
                 .finishUTC(current.getDateTimeUTC())
@@ -181,10 +239,16 @@ public class RecordProcessingService {
                 .build();
     }
 
-    private OutputRecord incompleteTripOutputRecord(InputRecord previous) {
-        return OutputRecord.builder()
-                .startUTC(previous.getDateTimeUTC())
-                .finishUTC(null)
+    /**
+     * Builds an output record for an incomplete trip.
+     *
+     * @param previous Previous input record
+     * @return Output record for the incomplete trip
+     */
+    private OutputRecord getIncompleteTripOutputRecord(InputRecord previous) {
+        LOG.trace("Incomplete trip output record");
+
+        OutputRecord record = OutputRecord.builder()
                 .durationSecs(null)
                 .fromStopId(previous.getStopId())
                 .toStopId(null)
@@ -194,5 +258,16 @@ public class RecordProcessingService {
                 .pan(previous.getPan())
                 .tripStatus(TripStatus.INCOMPLETE)
                 .build();
+
+        // If the incomplete trip is tapped on, set start time
+        if (previous.getTapType() == TapType.ON) {
+            record.setStartUTC(previous.getDateTimeUTC());
+            record.setFinishUTC(null);
+        } else { // If tapped off, set finish time
+            record.setStartUTC(null); // Start time is unknown for incomplete trips that are tapped off
+            record.setFinishUTC(previous.getDateTimeUTC());
+        }
+
+        return record;
     }
 }

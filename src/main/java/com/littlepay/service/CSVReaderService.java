@@ -42,9 +42,8 @@ public class CSVReaderService extends FileReaderService {
         try(
             Reader in = new FileReader(fileName);
         ) {
-            Iterable<CSVRecord> records = csvFormat.parse(in);
-
             List<InputRecord> inputRecords = new ArrayList<>();
+            Iterable<CSVRecord> records = csvFormat.parse(in);
 
             for (CSVRecord record : records) {
                 InputRecord inputRecord = convertToInputRecord(record);
@@ -62,7 +61,7 @@ public class CSVReaderService extends FileReaderService {
      * @return the converted InputRecord
      */
     private InputRecord convertToInputRecord(CSVRecord record) {
-        LOG.info("Converting InputRecord to InputRecord");
+        LOG.trace("Converting InputRecord to InputRecord");
 
         int id = Integer.parseInt(record.get("ID").trim());
 
