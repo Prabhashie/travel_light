@@ -1,12 +1,34 @@
 # TravelLight
 A simple Java Spring Boot CLI application demonstrating a **Simplified Business Model** of **LittlePay**.
 
+A sample output CSV, output_e2e.csv generated when a sample input CSV, input_e2e.csv is processed, 
+is included in the `src/test/resources` directory.
+
+Sample input CSV, input_e2e.csv:
+```csv
+ID,DateTimeUTC,TapType,StopId,CompanyId,BusID, PAN
+1,22/01/2023 13:00,ON,Stop1,Company1,Bus37,5500010000000000
+2,22/01/2023 13:05,OFF,Stop2,Company1,Bus37,5500010000000000
+3,22/01/2023 9:20,ON,Stop3,Company1,Bus36,4111110000000000
+4,23/01/2023 8:00,ON,Stop1,Company1,Bus37,4111110000000000
+5,23/01/2023 8:02,OFF,Stop1,Company1,Bus37,4111110000000000
+6,24/01/2023 16:30,OFF,Stop2,Company1,Bus37,5500010000000000
+```
+
+Sample output CSV, output_e2e.csv:
+```csv
+Started,Finished,DurationSecs,FromStopId,ToStopId,ChargeAmount,CompanyId,BusID,PAN,Status
+2023-01-22T09:20,N/A,N/A,Stop3,N/A,7.3,Company1,Bus36,4111110000000000,INCOMPLETE
+2023-01-23T08:00,2023-01-23T08:02,120,Stop1,Stop1,0.0,Company1,Bus37,4111110000000000,CANCELLED
+2023-01-22T13:00,2023-01-22T13:05,300,Stop1,Stop2,3.25,Company1,Bus37,5500010000000000,COMPLETE
+,2023-01-24T16:30,N/A,Stop2,N/A,5.5,Company1,Bus37,5500010000000000,INCOMPLETE
+```
 ---
-## Prerequisites
+# Prerequisites
 - Java 23 or higher
 - Maven 3.9.4 or higher
 ---
-## How to run the application
+# How to run the application
 Include the input CSV file in the `src/main/resources` directory. 
 The file should be named `input.csv`.
 
@@ -17,7 +39,7 @@ java -jar target/travel_light-1.0-SNAPSHOT.jar
 ```
 2. If running from an IDE, run the main method in the `com.travellight.TravelLightApplication` class.
 ---
-## How to run the tests
+# How to run the tests
 Include the input CSV file in the `src/test/resources` directory.
 The file should be named `input.csv`.
 
@@ -30,23 +52,11 @@ mvn clean test
 You can also run the tests individually by running the main method in each test class.
 
 ---
-## Assumptions
+# Assumptions
 - Since this is currently implemented as a CLI application, the input CSV file is expected to be in the `src/main/resources` directory
   and the output CSV file will be generated in the same directory.
 - Also, there's no user authorization or authentication implemented, so the application is assumed to be run by an authorized user.
----
-## Questions
-- Does the leg list include all possible combinations of legs along a route?
-- Can I consider all the data in the input CSV including PANs as valid?
-- Is the data in the input CSV always ordered by some criteria?
-- What is identified by a "Company"?
-- What's the scenario for index 6 in the input CSV?
-- How should the output file be ordered?
-- What happens if the user taps ON day 1 and then taps ON day 2 without tapping OFF on day 1?
-- If the user taps ON in one bus and taps ON in another bus without tapping OFF in the first, will the second tap always 
-  considered a tap ON?
-- What if the user touches ON the same bus several days apart?
-- Is a trip distinguished by the bus and stop combination even when multiple buses on the same route?
-- Duration of an incomplete trip?
+- All input data is assumed to be valid and well-formed.
+- A tap OFF with no matching tap ON is considered an incomplete trip.
 ---
 
