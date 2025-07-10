@@ -8,11 +8,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.littlepay.service.TestRecordProcessingFixtures.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+/**
+ * Unit tests for RecordProcessingService class.
+ * It additionally tests Spring configs as well.
+ *
+ * @author Sachi
+ */
 @SpringBootTest()
 @ContextConfiguration(classes = {
         RecordProcessingService.class,
@@ -46,6 +54,12 @@ public class RecordProcessingServiceTest {
     public void testProcessRecordsAllStatuses() {
         List<OutputRecord> actual = recordProcessingService.processRecords(COMBINED_INPUT);
         assertEquals(COMBINED_OUTPUT, actual);
+    }
+
+    @Test
+    public void testProcessRecordsEmptyInput() {
+        List<OutputRecord> actual = recordProcessingService.processRecords(new ArrayList<>());
+        assertNull(actual);
     }
 
 }

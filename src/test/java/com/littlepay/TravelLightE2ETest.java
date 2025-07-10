@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,7 +49,7 @@ public class TravelLightE2ETest {
     private String outputFileName;
 
     @BeforeEach
-    void cleanUpOutputFile() throws Exception {
+    void setUp() throws Exception {
         Path path = Paths.get(outputFileName);
         if (Files.exists(path)) {
             Files.delete(path);
@@ -56,7 +57,7 @@ public class TravelLightE2ETest {
     }
 
     @Test
-    void testContextLoadsAndRun() {
+    void testContextLoadsAndRun() throws IOException {
         LOG.info("Starting end-to-end test for TravelLight application...");
 
         // verify no output file exists before running the application

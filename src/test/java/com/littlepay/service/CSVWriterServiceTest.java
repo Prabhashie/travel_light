@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for CSVReadService class.
+ * It additionally tests Spring configs as well.
  *
  * @author Sachi
  */
@@ -36,7 +37,7 @@ public class CSVWriterServiceTest {
     private final Path EXPECTED = Paths.get(EXPECTED_FILE);
 
     @BeforeEach
-    void cleanUpOutputFile() throws Exception {
+    void setUp() throws Exception {
         if (Files.exists(ACTUAL)) {
             Files.delete(ACTUAL);
         }

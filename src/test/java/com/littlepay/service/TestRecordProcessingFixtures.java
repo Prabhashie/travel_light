@@ -6,6 +6,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * This class contains fixtures for testing the RecordProcessingService.
+ * It provides predefined input and output records for various scenarios.
+ *
+ * @author Sachi
+ */
 public class TestRecordProcessingFixtures {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy H:mm");

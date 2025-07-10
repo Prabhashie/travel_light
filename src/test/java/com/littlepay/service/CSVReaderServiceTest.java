@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for CSVReadService class.
+ * It additionally tests Spring configs as well.
  *
  * @author Sachi
  */

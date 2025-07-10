@@ -58,7 +58,9 @@ You can also run the tests individually by running the main method in each test 
 - Also, there's no user authorization or authentication implemented, so the application is assumed to be run by an authorized user.
 - All input data is assumed to be valid and well-formed.
 - A tap OFF with no matching tap ON is considered an incomplete trip.
-- I haven't written all possible test cases to meet coverage requirements in the interest of time. But the provided tests cover the main scenarios.
+- In the interest of time, not all real-world scenarios are covered, such as existance of multiple routes passing through the same stop, 
+  or multiple buses operating on the same route.
+- For the same reason as above, not all possible unit tests have been written to meet coverage requirements. The provided tests cover the main scenarios and an idea of the tests written.
 ---
 # Improvements
 - The application is designed to be simple and easy to understand, focusing on the core business logic.
@@ -66,3 +68,4 @@ You can also run the tests individually by running the main method in each test 
 - The true capabilities of Spring Boot, such as dependency injection, AOP, and transaction management, are not fully utilized in this simple CLI application.
 - Scalability and performance in a real world application can be explored by developing into a Restful API or a microservice by adding Rest Controllers to consume the API requests.
 - By hosting the application on a cloud platform like AWS, it can be made highly available and scalable.
+- Custom exceptions can be added to cover common error scenarios, such as data issues, IO issues or business logic errors which can be used to provide meaningful error messages to the user.

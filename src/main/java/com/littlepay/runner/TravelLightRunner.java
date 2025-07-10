@@ -21,7 +21,6 @@ import java.util.List;
  * @author Sachi
  */
 @Component
-// @Profile("!test") // Exclude this runner from the test profile
 public class TravelLightRunner implements CommandLineRunner {
 
     public static final Logger LOG = LoggerFactory.getLogger(TravelLightRunner.class);
@@ -45,17 +44,17 @@ public class TravelLightRunner implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws IOException {
         LOG.info("Running TravelLightRunner...");
 
         if (inputFileName == null || inputFileName.isEmpty()) {
 
             LOG.error("Input file path is not set or is empty. Please set the 'input.file.path' property.");
-            System.exit(1);
+            throw new IOException("Input file path is not set or is empty. Please set the 'input.file.path' property.");
         }
         if (outputFileName == null || outputFileName.isEmpty()) {
             LOG.error("Output file path is not set or is empty. Please set the 'output.file.path' property.");
-            System.exit(1);
+            throw new IOException("Output file path is not set or is empty. Please set the 'output.file.path' property.");
         }
 
         LOG.info("Input file name: {} and output file name: {}", inputFileName, outputFileName);
@@ -68,7 +67,7 @@ public class TravelLightRunner implements CommandLineRunner {
         } catch (IOException e) {
             // Log error and exit without throwing the plain exception for better user experience
             LOG.error("Error reading CSV file: {}", e.getMessage());
-            System.exit(1);
+            throw new IOException("Error reading CSV file: " + e.getMessage());
         }
 
         // Return early if no input records are found
@@ -92,8 +91,7 @@ public class TravelLightRunner implements CommandLineRunner {
         } catch (IOException e) {
             // Log error and exit without throwing the plain exception for better user experience
             LOG.error("Error writing to CSV file: {}", e.getMessage());
-            System.exit(1);
+            throw new IOException("Error writing to CSV file: " + e.getMessage());
         }
-
     }
 }
