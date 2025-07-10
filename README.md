@@ -58,6 +58,7 @@ You can also run the tests individually by running the main method in each test 
 - Also, there's no user authorization or authentication implemented, so the application is assumed to be run by an authorized user.
 - All input data is assumed to be valid and well-formed.
 - A tap OFF with no matching tap ON is considered an incomplete trip.
+- Fields that cannot be determined for Incomplete trips such as `Finished`, `DurationSecs`, and `ToStopId` are set to `N/A`.
 - In the interest of time, not all real-world scenarios are covered, such as existance of multiple routes passing through the same stop, 
   or multiple buses operating on the same route.
 - For the same reason as above, not all possible unit tests have been written to meet coverage requirements. The provided tests cover the main scenarios and an idea of the tests written.
